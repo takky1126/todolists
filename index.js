@@ -37,6 +37,7 @@ function button_savedText() {
     // 各テキストをボタンにして追加
     savedTexts.forEach((item, index) => { // itemを使ってタスクと期限を取得
         const button = document.createElement("button");
+        //const button_date = document.createElement("button");
         button.innerText = `${item.text} (期限: ${item.date})`; // ボタンにタスク名と期限を表示
 
         // 選択されたボタンにスタイルを適用
@@ -44,21 +45,22 @@ function button_savedText() {
             button.classList.add("selected");
         }
 
-        button.onclick = function() {
-            // すべてのボタンから選択状態を解除
+    // ボタンのクリックイベント
+    button.onclick = function() {
+        if (button.classList.contains('selected')) {
+            button.classList.remove("selected");
+            localStorage.setItem("selectedIndex", index); // 選択状態を保存
+        }else{
             document.querySelectorAll("#buttonContainer button").forEach(btn => {
-                btn.classList.remove("selected");
-            });
+            btn.classList.remove("selected");
+        });
+            button.classList.add("selected");
+        }
 
-            // クリックされたボタンに選択状態を適用
-            button.classList.toggle("selected");
-            if (button.classList.contains('selected')) {
-                localStorage.setItem("selectedIndex", index); // 選択状態を保存
-            } else {
-                localStorage.removeItem("selectedIndex"); // 選択解除
-            }
-        };
-        
+        // 選択状態のインデックスを保存
+        const index = Array.from(document.querySelectorAll("#buttonContainer button")).indexOf(button);
+        localStorage.setItem("selectedIndex", index);
+    };  
         buttonContainer.appendChild(button);
     });
 }
