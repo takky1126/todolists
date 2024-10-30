@@ -1,6 +1,8 @@
-document.getElementsByTagName('button')[0].addEventListener('click', () => {
+// TNTボタンがクリックされたときの処理
+document.getElementById('tntButton').addEventListener('click', () => {
     window.alert('bomb!');
 });
+
 
 // Enterで値を保存する関数
 function Entersave() {
@@ -49,18 +51,19 @@ function button_savedText() {
         button.onclick = function() {
             if (button.classList.contains('selected')) {
                 button.classList.remove("selected");
-                localStorage.setItem("selectedIndex", index); // 選択状態を保存
-            }else{
+                localStorage.removeItem("selectedIndex"); // 選択状態を解除したらローカルストレージもクリア
+            } else {
                 document.querySelectorAll("#buttonContainer button").forEach(btn => {
-                btn.classList.remove("selected");
-            });
+                    btn.classList.remove("selected");
+                });
                 button.classList.add("selected");
+        
+                // 選択状態のインデックスを保存
+                const index = Array.from(document.querySelectorAll("#buttonContainer button")).indexOf(button);
+                localStorage.setItem("selectedIndex", index);
             }
-
-            // 選択状態のインデックスを保存
-            const index = Array.from(document.querySelectorAll("#buttonContainer button")).indexOf(button);
-            localStorage.setItem("selectedIndex", index);
-        };  
+        };
+        
         buttonContainer.appendChild(button);
     });
 }
@@ -95,3 +98,48 @@ window.onload = function() {
     Entersave();
     button_savedText(); // 保存したテキストをボタンとして表示
 };
+
+// ページが読み込まれたときにメニューの状態を復元
+document.addEventListener("DOMContentLoaded", () => {
+    const menu = document.getElementById("menu");
+    const isOpen = localStorage.getItem("menuIsOpen") === "true"; // 保存された状態を取得
+    menu.style.display = isOpen ? "block" : "none";
+});
+
+function toggleMenu() {
+    const menu = document.getElementById("menu");
+    const isOpen = menu.style.display === "block";
+    menu.style.display = isOpen ? "none" : "block";
+
+    // メニューの開閉状態をローカルストレージに保存
+    localStorage.setItem("menuIsOpen", !isOpen);
+}
+
+// メニュー外をクリックしたときの処理
+window.onclick = function(event) {
+    const menu = document.getElementById("menu");
+    // メニュー以外の部分がクリックされた場合、かつメニューが開いている場合
+    if (!event.target.matches('.menu-button') && !menu.contains(event.target)) {
+        // ここでメニューが開いている場合だけ閉じる処理を行う
+        if (menu.style.display === "block") {
+            menu.style.display = "none";
+            // メニューが閉じた状態をローカルストレージに保存
+            localStorage.setItem("menuIsOpen", false);
+        }
+    }
+};
+
+// kind of taskの処理
+window.onclick = function kind_of_task_click(event) {
+    if (event.target.matches('.kind_of_task')) {
+        // テキストボックスを作成
+        const inputBox = document.createElement('input');
+        inputBox.type = 'text'; // 入力タイプをテキストに設定
+        inputBox.placeholder = '新しいタスクを入力'; // プレースホルダーを設定
+
+        // 新しいテキストボックスを指定のコンテナに追加
+        const container = document.getElementById('buttonContainer'); // 追加先のコンテナID
+        container.appendChild(inputBox); // コンテナにテキストボックスを追加
+    }
+};
+
