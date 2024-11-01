@@ -143,3 +143,7 @@ window.onclick = function kind_of_task_click(event) {
     }
 };
 
+function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'; // 'flex'に変更して縦に表示
+  }  
