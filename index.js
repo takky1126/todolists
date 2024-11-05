@@ -134,7 +134,7 @@ window.onclick = function kind_of_task_click(event) {
     if (event.target.matches('.kind_of_task')) {
         // テキストボックスを作成
         const inputBox = document.createElement('input');
-        inputBox.type = 'text'; // 入力タイプをテキストに設定
+        inputBox.type = 'text_2'; // 入力タイプをテキストに設定
         inputBox.placeholder = '新しいタスクを入力'; // プレースホルダーを設定
 
         // 新しいテキストボックスを指定のコンテナに追加
