@@ -1,5 +1,4 @@
-document.getElementById('addContainerButton').addEventListener('click', addTaskContainer);
-
+document.querySelector('.kind_of_task').addEventListener('click', kind_of_task_click);
 // TNTボタンがクリックされたときの処理
 document.getElementById('tntButton').addEventListener('click', () => {
     window.alert('bomb!');
@@ -95,57 +94,107 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
-// ページが読み込まれたときの処理
-window.onload = function() {
-    Entersave();
-    button_savedText(); // 保存したテキストをボタンとして表示
-};
-
-// ページが読み込まれたときにメニューの状態を復元
 document.addEventListener("DOMContentLoaded", () => {
+    Entersave();
+    button_savedText();
+    loadKindOfTask();
+    
     const menu = document.getElementById("menu");
-    const isOpen = localStorage.getItem("menuIsOpen") === "true"; // 保存された状態を取得
-    menu.style.display = isOpen ? "block" : "none";
+    menu.style.display = localStorage.getItem("menuIsOpen") === "true" ? "block" : "none";
+});
+
+// メニュー外をクリックしたときの処理
+window.addEventListener("click", function(event) {
+    const menu = document.getElementById("menu");
+    if (!event.target.matches('.menu-button') && !menu.contains(event.target) && menu.style.display === "block") {
+        menu.style.display = "none";
+        localStorage.setItem("menuIsOpen", false);
+    }
 });
 
 function toggleMenu() {
-    const menu = document.getElementById("menu");
-    const isOpen = menu.style.display === "block";
-    menu.style.display = isOpen ? "none" : "block";
-
-    // メニューの開閉状態をローカルストレージに保存
-    localStorage.setItem("menuIsOpen", !isOpen);
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    localStorage.setItem("menuIsOpen", menu.style.display === 'flex');
 }
 
-// メニュー外をクリックしたときの処理
-window.onclick = function(event) {
-    const menu = document.getElementById("menu");
-    // メニュー以外の部分がクリックされた場合、かつメニューが開いている場合
-    if (!event.target.matches('.menu-button') && !menu.contains(event.target)) {
-        // ここでメニューが開いている場合だけ閉じる処理を行う
-        if (menu.style.display === "block") {
-            menu.style.display = "none";
-            // メニューが閉じた状態をローカルストレージに保存
-            localStorage.setItem("menuIsOpen", false);
-        }
-    }
-};
 
-// kind of taskの処理
-window.onclick = function kind_of_task_click(event) {
-    if (event.target.matches('.kind_of_task')) {
-        // テキストボックスを作成
+// kind of taskのテキストボックスの内容をローカルストレージに保存
+function saveKindOfTask() {
+    const inputs = document.querySelectorAll('#kindOfTaskContainer input[type="text"]');
+    const inputValues = Array.from(inputs).map(input => input.value);
+    localStorage.setItem('kindOfTask', JSON.stringify(inputValues));
+}
+
+// ページ読み込み時にkind of taskのテキストボックスを復元
+function loadKindOfTask() {
+    const savedTasks = JSON.parse(localStorage.getItem('kindOfTask')) || []; // ⭐ 追加: ローカルストレージから保存データを取得
+    const container = document.getElementById('kindOfTaskContainer');
+    
+    savedTasks.forEach(value => {
         const inputBox = document.createElement('input');
-        inputBox.type = 'text_2'; // 入力タイプをテキストに設定
-        inputBox.placeholder = '新しいタスクを入力'; // プレースホルダーを設定
+        inputBox.type = 'text';
+        inputBox.placeholder = '新しいタスクを入力';
+        inputBox.value = value; // ⭐ 追加: テキストボックスに保存された値を設定
 
-        // 新しいテキストボックスを指定のコンテナに追加
-        const container = document.getElementById('buttonContainer'); // 追加先のコンテナID
-        container.appendChild(inputBox); // コンテナにテキストボックスを追加
+        // 入力が変更されたらローカルストレージに再保存
+        inputBox.addEventListener('input', saveKindOfTask);
+        container.appendChild(inputBox);
+    });
+}
+
+// kindOfTask クリック時に新しいテキストボックスを追加する処理
+function kind_of_task_click(event) {
+    const container = document.getElementById('kindOfTaskContainer'); 
+    const inputBox = document.createElement('input');
+    inputBox.type = 'text';
+    inputBox.placeholder = '新しいタスクを入力';
+  
+    // 入力が変更されたらローカルストレージに保存
+    inputBox.addEventListener('input', saveKindOfTask);
+    
+    // 新しく追加されたテキストボックスにフォーカスを設定
+    inputBox.addEventListener('focus', function() {
+      setTimeout(function() {
+        inputBox.select();  // フォーカス時に内容を選択する
+      }, 0);
+    });
+  
+    container.appendChild(inputBox);
+    saveKindOfTask();
+  }
+
+// 'Ctrl + Delete' でテキストボックスを削除する処理
+document.addEventListener('keydown', function (event) {
+    // Ctrl + Deleteが押された場合
+    if (event.ctrlKey && event.key === 'Delete') {
+      const focusedElement = document.activeElement;
+  
+      // フォーカスされている要素がテキストボックスの場合
+      if (focusedElement.tagName === 'INPUT' && focusedElement.type === 'text') {
+        focusedElement.remove();  // テキストボックス自体を削除
+        saveKindOfTask(); // テキストボックスの削除後に保存を再実行
+      }
     }
-};
+  });
+  
+// kindOfTask クリック時に新しいテキストボックスを追加する処理
+function kind_of_task_click(event) {
+  const container = document.getElementById('kindOfTaskContainer'); 
+  const inputBox = document.createElement('input');
+  inputBox.type = 'text';
+  inputBox.placeholder = '新しいタスクを入力';
 
-function toggleMenu() {
-    const menu = document.getElementById('menu');
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'; // 'flex'に変更して縦に表示
-  }  
+  // 入力が変更されたらローカルストレージに保存
+  inputBox.addEventListener('input', saveKindOfTask);
+  
+  // 新しく追加されたテキストボックスにフォーカスを設定
+  inputBox.addEventListener('focus', function() {
+    setTimeout(function() {
+      inputBox.select();  // フォーカス時に内容を選択する
+    }, 0);
+  });
+
+  container.appendChild(inputBox);
+  saveKindOfTask();
+}
