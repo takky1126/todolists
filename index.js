@@ -1,3 +1,5 @@
+document.getElementById('addContainerButton').addEventListener('click', addTaskContainer);
+
 // TNTボタンがクリックされたときの処理
 document.getElementById('tntButton').addEventListener('click', () => {
     window.alert('bomb!');
